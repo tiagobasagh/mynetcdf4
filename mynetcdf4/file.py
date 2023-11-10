@@ -6,6 +6,9 @@ from manipulate import extract_from_region, netcdf_to_dict
 logerr = False
 
 def netcdf_del_attrs(ds):
+    """
+    Funcion que elimina los atributos de un dado Objet.netCDF4.Dataset
+    """
     attrs = ds.__dict__.keys()
     for attr in attrs:
         delattr(ds, attr)
@@ -13,6 +16,10 @@ def netcdf_del_attrs(ds):
 
 
 def netcdf_copy_attr(ds, newds, tocattr=None):
+    """
+    Funcion qeu copia los attributos de un dado 
+    Objet.netCDDF4.Dataser a otro objeto similar.
+    """
     newds = netcdf_del_attrs(newds)
     if not tocattr:
         for attr, value in ds.__dict__.items():
@@ -24,6 +31,10 @@ def netcdf_copy_attr(ds, newds, tocattr=None):
 
 
 def netcdf_reshape_dims(newds, ds, newshapes):
+    """
+    Funcion que copia las dimensiones de otro netCDF4 modificando las dimensiones.
+    [Esta funcion deberia cambiarse seguramente]
+    """
     for dim, info in ds.dimensions.items():
         if info.isunlimited():
             newds.createDimension(dim)
@@ -33,6 +44,9 @@ def netcdf_reshape_dims(newds, ds, newshapes):
 
 
 def netcdf_new_variables_from_dict(newds, variables, dims):
+    """
+    Funcion que crea variables para un .nc dado un diccionarioa
+    """
     ds_var = dict()
     for varname, info in variables.items():
         if logerr:
@@ -55,6 +69,9 @@ def netcdf_new_variables_from_dict(newds, variables, dims):
     return newds
 
 
+def new_netcdf(filedir, metadata, variables, dimensiones):
+    pass
+
 def netcdf_reduct_to_a_region(
     ds,
     newds,
@@ -63,6 +80,9 @@ def netcdf_reduct_to_a_region(
     tocattr=None,
     kvars=None,
 ):
+    """
+    
+    """
     def _add_info_variables(ds, newdictvar, kvars):
         variables = dict()
         for varname in kvars:
