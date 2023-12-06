@@ -1,9 +1,6 @@
 import os
 import subprocess
 
-from oceanpy.mydatasets import exist_or_create
-
-#  cdo mergetime *.nc MARARG2001.nc
 
 def cmd_reduce_netcdf4(nf1, nf2, lon1, lon2, lat1, lat2):
     return f"cdo sellonlatbox,{lon1},{lon2},{lat1},{lat2} {nf1} {nf2}"
@@ -28,7 +25,9 @@ def multiple_reduce_netcdf4(region, ipath, npath=None, join=True,ignore_folders=
         if os.path.isfile(auxpath):
             reduce_netcdf4(auxpath, region, nf2=auxnewpath)
         elif os.path.isdir(auxpath) and nf not in ignore_folders:
-            exist_or_create(auxnewpath)
+            if not os.path.exists(auxnewpath):
+                os.mkdir(auxnewpath)
+
             multiple_reduce_netcdf4(
                 region, 
                 auxpath, 
