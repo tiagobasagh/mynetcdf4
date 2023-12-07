@@ -17,11 +17,12 @@ def extract_var(nf, var, dims=["time", "lat", "lon"]):
 
 
 def as_dict(
-    ds, kvars=None, namedims={"time": "time", "lat": "lat", "lon": "lon"}
+    nf, kvars=None, namedims={"time": "time", "lat": "lat", "lon": "lon"}
 ):
     """
     
     """
+    ds = nc.Dataset(nf)
     if not kvars:
         kvars = ds.variables.keys()
     dictvar = dict()
@@ -33,7 +34,7 @@ def as_dict(
     lat = ds[namedims["lat"]][:]
     lon = ds[namedims["lon"]][:]
     time = ds[namedims["time"]][:]
-
+    ds.close()
     return dictvar, time, lat, lon
 
 
@@ -55,6 +56,9 @@ def _add_values_from_dict(nf, variables, time, axis=0):
 
 
 def multiple_files(nfs, kvars=None):
+    """
+    
+    """
     ds = nc.Dataset(nfs[0])
     variables, time, lat, lon = as_dict(ds, kvars=kvars)
     for nf in nfs[1:]:
