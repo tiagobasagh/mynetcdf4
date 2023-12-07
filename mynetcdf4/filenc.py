@@ -1,11 +1,14 @@
 import netCDF4 as nc
 import numpy as np
 
-from manipulate import extract_from_region, netcdf_to_dict
+import opennc 
+from data import extract_from_region
 
 logerr = False
 
-def netcdf_del_attrs(ds):
+# copy, reduce, new nc 
+
+def _del_attrs(ds):
     """
     Funcion que elimina los atributos de un dado Objet.netCDF4.Dataset
     """
@@ -15,12 +18,12 @@ def netcdf_del_attrs(ds):
     return ds
 
 
-def netcdf_copy_attr(ds, newds, tocattr=None):
+def _copy_attr(ds, newds, tocattr=None):
     """
     Funcion qeu copia los attributos de un dado 
     Objet.netCDDF4.Dataser a otro objeto similar.
     """
-    newds = netcdf_del_attrs(newds)
+    newds = _del_attrs(newds)
     if not tocattr:
         for attr, value in ds.__dict__.items():
             newds.setncattr(attr, value)
@@ -30,7 +33,7 @@ def netcdf_copy_attr(ds, newds, tocattr=None):
     return newds
 
 
-def netcdf_reshape_dims(newds, ds, newshapes):
+def _reshape_dims(newds, ds, newshapes):
     """
     Funcion que copia las dimensiones de otro netCDF4 modificando las dimensiones.
     [Esta funcion deberia cambiarse seguramente]
@@ -43,7 +46,7 @@ def netcdf_reshape_dims(newds, ds, newshapes):
     return newds
 
 
-def netcdf_new_variables_from_dict(newds, variables, dims):
+def _variables_from_dict(newds, variables, dims):
     """
     Funcion que crea variables para un .nc dado un diccionarioa
     """
@@ -69,10 +72,15 @@ def netcdf_new_variables_from_dict(newds, variables, dims):
     return newds
 
 
-def new_netcdf(filedir, metadata, variables, dimensiones):
+def new_netcdf4(filedir, metadata, variables, dimensiones):
     pass
 
-def netcdf_reduct_to_a_region(
+
+def reduce_time():
+    pass
+
+
+def reduce_to_a_region(
     ds,
     newds,
     region,
@@ -98,7 +106,7 @@ def netcdf_reduct_to_a_region(
     if not kvars:
         kvars = ds.variables.keys()
     # cargo ds original
-    dictvar, time, lat, lon = netcdf_to_dict(ds, kvars, namedims=namedims)
+    dictvar, time, lat, lon = opennc.as_dict(ds, kvars, namedims=namedims)
 
     # extraigo la region
     newdictvar, newlat, newlon = extract_from_region(dictvar, lat, lon, region)
@@ -107,18 +115,18 @@ def netcdf_reduct_to_a_region(
     newdictvar[namedims["time"]] = time
 
     # copio atributos
-    newds = netcdf_copy_attr(ds, newds, tocattr=tocattr)
+    newds = _copy_attr(ds, newds, tocattr=tocattr)
 
     # copio y redefino tamano dimensioens 
     newshapes = {namedims["lat"]: newlat.shape[0],
                  namedims["lon"]: newlon.shape[0]}
     
-    newds = netcdf_reshape_dims(newds, ds, newshapes)
+    newds = _reshape_dims(newds, ds, newshapes)
 
     # creo nuevas  variables
     dims = tuple(ds.dimensions.keys())
     variables = _add_info_variables(ds, newdictvar, kvars)
-    newds = netcdf_new_variables_from_dict(newds, variables, dims)
+    newds = _variables_from_dict(newds, variables, dims)
 
     return newds
 
