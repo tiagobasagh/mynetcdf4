@@ -16,3 +16,4 @@ setup(
         "jinja2",
     ],
     setup_requires=["flake8", "black"],
+)
