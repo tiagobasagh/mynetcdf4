@@ -8,9 +8,9 @@ def extract_var(nf, var, dims=["time", "lat", "lon"]):
     """
     
     """
-    ds = nc.MFDataset(nf)
+    ds = nc.Dataset(nf)
     variables = ds.variables.copy()
-    vardims = [variables[d][:] for d in dims]
+    vardims = {d:variables[d][:] for d in dims}
     v = variables[var][:]
     ds.close()
     return vardims, v
