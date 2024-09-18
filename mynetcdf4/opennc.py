@@ -4,11 +4,15 @@ import numpy as np
 logerr = False
 
 
-def extract_var(nf, var, dims=["time", "lat", "lon"]):
+def extract_var(nf, var, dims=["time", "lat", "lon"], mf=False):
     """
     
     """
-    ds = nc.MFDataset(nf)
+    if mf:
+        ds = nc.MFDataset(nf)
+    else:
+        ds = nc.Dataset(nf)
+    
     variables = ds.variables.copy()
     vardims = [variables[d][:] for d in dims]
     v = variables[var][:]
